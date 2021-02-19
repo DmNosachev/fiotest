@@ -70,9 +70,9 @@ for PASS in $(eval echo {1..$ROUNDS});
 do
 	for RWMIX in 100 70 0;
     do
-		for BS in 4096 8192;
+		for BS in 4096;
 		do
-			for THREADS in 1 2 4;
+			for THREADS in 1 2 4 8 16;
 				do
 				for OIO in 1 2 4 8 16 32;
 				do
