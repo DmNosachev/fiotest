@@ -3,21 +3,19 @@
 
 #!/bin/bash
 
-# SNIA PTS Test 04: Write Saturation
+#Throughtput Test
+
+readonly ROUNDS=15;
+readonly FIO="/usr/bin/fio"
+readonly TEST_NAME="03_Latency_test_SNIA"
+LOG_FILE=${TEST_NAME}/results/test.log
+TIMESTAMP=$(date +%Y-%m-%d %H:%M:%S)
 
 usage()
 {
 	echo "Usage: $0 /dev/<device to test>"
     exit 0
 }
-
-readonly OIO=32;
-readonly THREADS=4;
-readonly ROUNDS=360;
-FIO="/usr/bin/fio"
-readonly TEST_NAME="04_Write_Saturation_test"
-LOG_FILE=${TEST_NAME}/results/test.log
-TIMESTAMP=$(date +%Y-%m-%d %H:%M:%S)
 
 if [ $# -lt 1 ] ; then
 	usage
@@ -39,15 +37,17 @@ mkdir -p ${TEST_NAME}/results
 echo "$TIMESTAMP Running ${TEST_NAME} on device: $1" >> $LOG_FILE
 
 
-echo "Device information:" >> $LOG_FILE
-smartctl -i $1 >> $LOG_FILE
+#echo "Device information:" >> $LOG_FILE
+#smartctl -i $1 >> $LOG_FILE
 
 #purge the device
 
+#/opt/HGST/hdm/bin/hdm secure-erase --force --type user --path /dev/nvme0
+#sleep 30
+#sg_format --format $1
 #hdparm --user-master u --security-set-pass PasSWorD $1
 #hdparm --user-master u --security-erase PasSWorD $1
-
-/usr/sbin/nvme format $1
+nvme format $1
 
 echo "$TIMESTAMP Purge done" >> $LOG_FILE
 
@@ -58,7 +58,7 @@ echo "Test Start time: `date`" >> $LOG_FILE
 #Workload independent preconditioning
 #Run SEQ Workload Independent Preconditioning - Write 2X User Capacity with 128KiB SEQ writes, writing to the entire ActiveRange without LBA restrictions
 
-$FIO --name=precondition --filename=$1 --iodepth=16 --numjobs=1 --bs=128k --ioengine=libaio --rw=write --group_reporting --direct=1 --thread --refill_buffers --loops=2
+$FIO --name=precondition --filename=$1 --iodepth=64 --numjobs=1 --bs=128k --ioengine=libaio --rw=write --group_reporting --direct=1 --thread --refill_buffers --loops=2
 echo "$TIMESTAMP Preconditioning done" >> $LOG_FILE
 
 echo "$TIMESTAMP Starting test $TEST_NAME" >> $LOG_FILE
@@ -66,18 +66,25 @@ echo "$TIMESTAMP Starting test $TEST_NAME" >> $LOG_FILE
 #Test 
 echo "Starting test $TEST_NAME"
 
+#Workload Dependent Pre-conditioning
+
 for PASS in $(eval echo {1..$ROUNDS});
 do
-	$FIO --output-format=json --name=job --filename=$1 --iodepth=$OIO --numjobs=$THREADS --bs=4096 --ioengine=libaio --rw=randwrite --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}.json
+	for RWMIX in 100 65 0;
+    do
+		for BS in 512 4096 8192;
+		do
+      $FIO --output-format=json --name=job --filename=$1 --iodepth=1 --numjobs=1 --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}_rw=${RWMIX}_bs=${BS}.json
+		done
+	done
 	clear
     echo -e "$TIMESTAMP ${TEST_NAME} pass $PASS of $ROUNDS done" >> $LOG_FILE
 done
 
-#Run Response Histogram - Time Confidence Level Plot
+#3.3 For (R/W% = 0/100 4KiB)
 
 $FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=0 --group_reporting --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_t3ph2.json
 
 echo -e "$TIMESTAMP ${TEST_NAME} 2nd phase done" >> $LOG_FILE
 
 exit 0
-
