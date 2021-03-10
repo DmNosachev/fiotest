@@ -22,6 +22,7 @@ for bs in block_sizes:
   silentremove(csv_file_name)
   with open(csv_file_name, mode='w') as csv_file:
     test_round_writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL, dialect='unix')
+    test_round_writer.writerow(['round', 'av_lat'])
     for test_pass in range(1, rounds + 1):
       json_file_name = 'fio_pass=' + str(test_pass) + '_rw=0' + '_bs=' + str(bs) + '.json'
       full_json_file_path = os.path.join(script_dir, results_path, json_file_name)
