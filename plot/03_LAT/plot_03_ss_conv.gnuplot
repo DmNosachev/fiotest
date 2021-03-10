@@ -23,10 +23,8 @@ set key bottom
 
 set datafile separator ";"
 
-#set xtics 10
-#set ytics (0.1, 0.2, 0.3, 0.4, 0.8, 1, 2, 3 , 10, 12, 50, 100, 200)
+set xtics 1
 set yrange [0: ]
-#set xrange [0:180]
 #set logscale y
 set title "CM6 SS Convergence"
 set xlabel 'Round'
