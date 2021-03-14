@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 
 import json, csv
 import os, errno
@@ -7,8 +7,8 @@ processing_name = 'test03_main'
 block_sizes = [512, 4096, 8192]
 rw_mixes = [100, 65, 0]
 
-script_dir = os.path.dirname(__file__)
-results_path = "results/"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+results_path = "results"
 
 def silentremove(filename):
   try:
@@ -41,22 +41,27 @@ with open(csv_file_name, mode='w') as csv_file:
         json_file_name = 'fio_pass=' + str(test_pass) + '_rw=' + str(rwmix) + '_bs=' + str(bs) + '.json'
         full_json_file_path = os.path.join(script_dir, results_path, json_file_name)
         with open(full_json_file_path, 'r') as json_file:
-          json_data = json.load(json_file)
-          iops = json_data['jobs'][0]['read']['iops'] + json_data['jobs'][0]['write']['iops']
-          average_lat = json_data['jobs'][0]['read']['clat_ns']['mean'] + json_data['jobs'][0]['write']['clat_ns']['mean']
-          # Absense of IOs means absense of latency statistics
-          if json_data['jobs'][0]['read']['total_ios'] == 0:
-            perc_99d99_lat_read = 0
-          else:
-            perc_99d99_lat_read = json_data['jobs'][0]['read']['clat_ns']['percentile']['99.990000']
-          if json_data['jobs'][0]['write']['total_ios'] == 0:
-            perc_99d99_lat_write = 0
-          else:
-            perc_99d99_lat_write = json_data['jobs'][0]['write']['clat_ns']['percentile']['99.990000']
-          
-          perc_99d99_lat = perc_99d99_lat_read + perc_99d99_lat_write
-          max_lat = json_data['jobs'][0]['read']['clat_ns']['max'] + json_data['jobs'][0]['write']['clat_ns']['max']
-          json_file.close()
+          try:
+            json_data = json.load(json_file)
+            iops = json_data['jobs'][0]['read']['iops'] + json_data['jobs'][0]['write']['iops']
+            average_lat = json_data['jobs'][0]['read']['clat_ns']['mean'] + json_data['jobs'][0]['write']['clat_ns']['mean']
+            # Absense of IOs means absense of latency statistics
+            if json_data['jobs'][0]['read']['total_ios'] == 0:
+              perc_99d99_lat_read = 0
+            else:
+              perc_99d99_lat_read = json_data['jobs'][0]['read']['clat_ns']['percentile']['99.990000']
+            if json_data['jobs'][0]['write']['total_ios'] == 0:
+              perc_99d99_lat_write = 0
+            else:
+              perc_99d99_lat_write = json_data['jobs'][0]['write']['clat_ns']['percentile']['99.990000']
+            
+            perc_99d99_lat = perc_99d99_lat_read + perc_99d99_lat_write
+            max_lat = json_data['jobs'][0]['read']['clat_ns']['max'] + json_data['jobs'][0]['write']['clat_ns']['max']
+            json_file.close()
+          except ValueError:
+            print("Invalid JSON in " + json_file_name)
+            csv_file.close()
+            exit(1)
         iops_list.append(iops)
         average_lat_list.append(average_lat)
         perc_99d99_lat_list.append(perc_99d99_lat)

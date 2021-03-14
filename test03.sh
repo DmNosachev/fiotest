@@ -74,7 +74,7 @@ do
     do
 		for BS in 512 4096 8192;
 		do
-      $FIO --output-format=json+ --name=job --filename=$1 --iodepth=1 --numjobs=1 --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}_rw=${RWMIX}_bs=${BS}.json
+      $FIO --output-format=json+ --name=job --filename=$1 --iodepth=1 --numjobs=1 --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --output=${TEST_NAME}/results/fio_pass=${PASS}_rw=${RWMIX}_bs=${BS}.json
 		done
 	done
 	clear
@@ -83,7 +83,7 @@ done
 
 #3.3 For (R/W% = 0/100 4KiB)
 
-$FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=0 --group_reporting --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_t3ph2.json
+$FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=0 --group_reporting --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --output=${TEST_NAME}/results/fio_t3ph2.json
 
 echo -e "$TIMESTAMP ${TEST_NAME} 2nd phase done" >> $LOG_FILE
 

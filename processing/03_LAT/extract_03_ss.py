@@ -7,8 +7,8 @@ rounds = 15
 processing_name = 'test03_ss'
 block_sizes = [512, 4096, 8192]
 
-script_dir = os.path.dirname(__file__)
-results_path = "results/"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+results_path = "results"
 
 def silentremove(filename):
   try:
@@ -27,8 +27,13 @@ for bs in block_sizes:
       json_file_name = 'fio_pass=' + str(test_pass) + '_rw=0' + '_bs=' + str(bs) + '.json'
       full_json_file_path = os.path.join(script_dir, results_path, json_file_name)
       with open(full_json_file_path, 'r') as json_file:
-        json_data = json.load(json_file)
-        average_lat = json_data['jobs'][0]['write']['clat_ns']['mean']
-        json_file.close()
-        test_round_writer.writerow([test_pass, average_lat])
+        try:
+          json_data = json.load(json_file)
+          average_lat = json_data['jobs'][0]['write']['clat_ns']['mean']
+          json_file.close()
+          test_round_writer.writerow([test_pass, average_lat])
+        except ValueError:
+          print("Invalid JSON in " + json_file_name)
+          exit(1)
   csv_file.close()
+  
