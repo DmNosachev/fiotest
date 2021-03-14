@@ -74,7 +74,7 @@ do
     do
 		for BS in 512 4096 8192;
 		do
-      $FIO --output-format=json --name=job --filename=$1 --iodepth=1 --numjobs=1 --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}_rw=${RWMIX}_bs=${BS}.json
+      $FIO --output-format=json+ --name=job --filename=$1 --iodepth=1 --numjobs=1 --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --runtime=60 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}_rw=${RWMIX}_bs=${BS}.json
 		done
 	done
 	clear
