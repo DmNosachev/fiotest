@@ -47,7 +47,7 @@ echo "$TIMESTAMP Running ${TEST_NAME} on device: $1" >> $LOG_FILE
 #sg_format --format $1
 #hdparm --user-master u --security-set-pass PasSWorD $1
 #hdparm --user-master u --security-erase PasSWorD $1
-#/usr/local/sbin/nvme format $1
+nvme format $1
 
 echo "$TIMESTAMP Purge done" >> $LOG_FILE
 
@@ -58,7 +58,7 @@ echo "Test Start time: `date`" >> $LOG_FILE
 #Workload independent preconditioning
 #Run SEQ Workload Independent Preconditioning - Write 2X User Capacity with 128KiB SEQ writes, writing to the entire ActiveRange without LBA restrictions
 
-$FIO --name=precondition --filename=$1 --iodepth=16 --numjobs=1 --bs=128k --ioengine=libaio --rw=write --group_reporting --direct=1 --thread --refill_buffers --loops=2
+$FIO --name=precondition --filename=$1 --iodepth=256 --numjobs=1 --bs=128k --ioengine=libaio --rw=write --group_reporting --direct=1 --thread --refill_buffers --loops=2
 echo "$TIMESTAMP Preconditioning done" >> $LOG_FILE
 
 echo "$TIMESTAMP Starting test $TEST_NAME" >> $LOG_FILE
@@ -74,9 +74,9 @@ do
 		do
 			for THREADS in 1 2 4 8 16;
 				do
-				for OIO in 1 2 4 8 16 32;
+				for OIO in 1 2 4 8 16 32 64;
 				do
-					$FIO --output-format=json --name=job --filename=$1 --iodepth=$OIO --numjobs=$THREADS --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --ramp_time=5 --runtime=30 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --output=${TEST_NAME}/results/fio_pass=${PASS}_QD=${OIO}_TC=${THREADS}_rw=${RWMIX}_bs=${BS}.json
+					$FIO --output-format=json --name=job --filename=$1 --iodepth=$OIO --numjobs=$THREADS --bs=$BS --ioengine=libaio --rw=randrw --rwmixread=$RWMIX --group_reporting --ramp_time=5 --runtime=30 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --output=${TEST_NAME}/results/fio_pass=${PASS}_QD=${OIO}_TC=${THREADS}_rw=${RWMIX}_bs=${BS}.json
 				done
 			done
 		done
