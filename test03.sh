@@ -82,8 +82,10 @@ do
 done
 
 #3.3 For (R/W% = 0/100 4KiB)
+$FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=100 --group_reporting --ramp_time=10 --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --write_lat_log=test03write --disable_slat=1 --slat_percentiles=0 --log_avg_msec=1 --output=${TEST_NAME}/results/fio_t3ph2_write.json
 
-$FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=0 --group_reporting --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --output=${TEST_NAME}/results/fio_t3ph2.json
+# optional read test
+$FIO --output-format=json+ --name=job2 --filename=$1 --iodepth=1 --numjobs=1 --bs=4096 --ioengine=libaio --rw=randrw --rwmixread=100 --group_reporting --ramp_time=10 --runtime=1200 --time_based --direct=1 --randrepeat=0 --norandommap --thread --refill_buffers --random_generator=tausworthe64 --write_lat_log=test03read --disable_slat=1 --slat_percentiles=0 --log_avg_msec=1 --output=${TEST_NAME}/results/fio_t3ph2_read.json
 
 echo -e "$TIMESTAMP ${TEST_NAME} 2nd phase done" >> $LOG_FILE
 
