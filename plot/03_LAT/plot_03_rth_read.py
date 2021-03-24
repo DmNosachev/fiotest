@@ -11,7 +11,7 @@ plt.rc('font', size=8)
 
 filename = 'test03read_clat.1.log'
 processed_filename = 'test03_read.csv'
-device_name = 'CD6-V'
+device_name = 'CM6-V'
 
 fields = ['time_ms', 'clat_ns', 'data_direction', 'block_size', 'prio']
 
