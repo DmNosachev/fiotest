@@ -66,5 +66,5 @@ with open(csv_file_name, mode='w') as csv_file:
         average_lat_list.append(average_lat)
         perc_99d99_lat_list.append(perc_99d99_lat)
         max_lat_list.append(max_lat)
-      test_round_writer.writerow([bs, rwmix, Average(iops_list), Average(average_lat_list), Average(perc_99d99_lat_list), max(max_lat_list)])
+      test_round_writer.writerow([bs, rwmix, int(round(Average(iops_list))), round(Average(average_lat_list)/1000,1), round(Average(perc_99d99_lat_list)/1000,1), round(max(max_lat_list)/1000,1)])
   csv_file.close()
