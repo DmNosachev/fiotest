@@ -5,8 +5,8 @@ import os, errno
 import pandas as pd
 
 processing_name = 'test03_2_main'
-tc_set = [1, 2, 4, 8, 16]
-qd_set = [1, 2, 4, 8, 16, 32, 64]
+tc_set = [1, 2, 4, 8, 16, 32, 64]
+qd_set = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 rw_mixes = [100, 70, 0]
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -27,13 +27,13 @@ average_lat_list = []
 perc_99d99_lat_list = []
 max_lat_list = []
 
-for rwmix in rw_mixes:
-  csv_file_name = processing_name + str(rwmix) + '.csv'
-  silentremove(csv_file_name)
-
-  with open(csv_file_name, mode='w') as csv_file:
-    test_round_writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL, dialect='unix')
-    test_round_writer.writerow(['TC', 'QD', 'RWMIX', 'IOPS', 'AV_LAT', 'P99d99_LAT', 'MAX_LAT'])           
+csv_file_name =  'lat03_2.csv'
+silentremove(csv_file_name)
+  
+with open(csv_file_name, mode='w') as csv_file:
+  test_round_writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL, dialect='unix')
+  test_round_writer.writerow(['TC', 'QD', 'RWMIX', 'IOPS', 'AV_LAT', 'P99D99_LAT', 'MAX_LAT'])           
+  for rwmix in rw_mixes:
     for tc in tc_set:
       for qd in qd_set:
         iops_list.clear()
@@ -70,4 +70,4 @@ for rwmix in rw_mixes:
           perc_99d99_lat_list.append(perc_99d99_lat)
           max_lat_list.append(max_lat)
           test_round_writer.writerow([tc, qd, rwmix, int(round(Average(iops_list))), round(Average(average_lat_list)/1000,1), round(Average(perc_99d99_lat_list)/1000,1), round(max(max_lat_list)/1000,1)])
-    csv_file.close()
+csv_file.close()
