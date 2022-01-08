@@ -6,11 +6,11 @@ import sys
 import shutil
 from pathlib import Path
 
-def prepResultsDir():
-  dirpath = Path('results')
+def prepResultsDir(testName):
+  dirpath = Path(testName) / 'results'
   if dirpath.exists() and dirpath.is_dir():
       shutil.rmtree(dirpath)
-  os.mkdir(dirpath)
+  dirpath.mkdir(parents=True)
 
 def isProg(progName):
   return which(progName) is not None

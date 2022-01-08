@@ -8,14 +8,17 @@ from pathlib import Path
 import shutil
 import ptsutils as ptsu
 from tqdm import tqdm
+from command_runner import command_runner
+
+TestName = '01_WSAT'
 
 try:
-    os.remove('test01.log')
+    os.remove(TestName + '.log')
 except OSError:
     pass
     
 logging.basicConfig(format='%(asctime)s %(message)s',
-                    filename='test01.log', encoding='utf-8',
+                    filename=TestName + '.log', encoding='utf-8',
                     level=logging.INFO)
 
 parser = argparse.ArgumentParser(description='SNIA PTS 2.0.2 IOPS Test')
@@ -61,13 +64,13 @@ else:
   
 BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
 RWMixes = [100, 95, 65, 50, 35, 5, 0]
+RoundTime = 60
 
-FioArgs = ['--output-format=json+', "--eta=always",
-          '--name=job', '--rw=randrw', '--group_reporting',
-          '--runtime=60', '--direct=1', '--norandommap',
-          '--refill_buffers']
+FioArgs = ['--output-format=json', '--eta=always',
+          '--name=job', '--rw=randrw', '--direct=1',
+          '--norandommap', '--refill_buffers']
 
-ptsu.prepResultsDir()
+ptsu.prepResultsDir(TestName)
 
 if not args.SkipErase:
   ptsu.devicePurge(str(args.DevType), str(args.Device))
@@ -77,16 +80,18 @@ if not args.SkipPrecond:
   ptsu.stdPrecond(str(args.Device))
   logging.info('Preconditioning done')
 
+logging.info('Starting test: ' + TestName)
 for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
   for RWMix in RWMixes:
       for BS in BlockSizes:
         JSONFileName = ('fio_pass=' + str(TestPass) + '_rw=' + str(RWMix)
                        + '_bs=' + str(BS) + '.json')
-        p = subprocess.Popen(['fio', '--filename=' + str(args.Device),
-                           '--iodepth=' + str(OIO), '--numjobs=' + str(TC),
-                           '--bs=' + str(BS), '--ioengine=' + str(args.IOEngine),
-                           '--rwmixread=' + str(RWMix),
-                           '--output=results/' + JSONFileName] + FioArgs,
-                           stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-                           universal_newlines=True)
+        exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
+                           ' --filename=' + str(args.Device) +
+                           ' --iodepth=' + str(OIO) + ' --numjobs=' + str(TC) +
+                           ' --bs=' + str(BS) + ' --ioengine=' + str(args.IOEngine) +
+                           ' --rwmixread=' + str(RWMix) +
+                           ' --output=' + TestName + '/results/' + JSONFileName +
+                           ' ' + ' '.join(FioArgs),
+                           shell=True, live_output=True, timeout=RoundTime)
   logging.info('Round ' + str(TestPass) + ' of ' + str(args.MaxRounds) + ' complete')
