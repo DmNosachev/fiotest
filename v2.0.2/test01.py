@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 import shutil
 import ptsutils as ptsu
+from tqdm import tqdm
 
 try:
     os.remove('test01.log')
@@ -24,6 +25,14 @@ parser.add_argument('-t','--device-type', default='sata', const='sata',
                     nargs='?', dest='DevType',
                     choices=['sata', 'sas', 'nvme', 'other'],
                     help='Device type (sata/sas/nvme/other) \
+                    (default: %(default)s)',
+                    required=False)
+parser.add_argument('-e','--engine', default='libaio', const='libaio',
+                    nargs='?', dest='IOEngine',
+                    choices=['libaio', 'windowsaio', 'io_uring', 'sg',
+                            'null', 'libiscsi'],
+                    help='Fio IO engine (libaio/windowsaio/io_uring/sg/ \
+                          null/libiscsi) \
                     (default: %(default)s)',
                     required=False)
 parser.add_argument('-c','--pts-c', action='store_true', dest='PTSClMode',
@@ -53,6 +62,11 @@ else:
 BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
 RWMixes = [100, 95, 65, 50, 35, 5, 0]
 
+FioArgs = ['--output-format=json+', "--eta=always",
+          '--name=job', '--rw=randrw', '--group_reporting',
+          '--runtime=60', '--direct=1', '--norandommap',
+          '--refill_buffers']
+
 ptsu.prepResultsDir()
 
 if not args.SkipErase:
@@ -63,19 +77,16 @@ if not args.SkipPrecond:
   ptsu.stdPrecond(str(args.Device))
   logging.info('Preconditioning done')
 
-for TestPass in range(1, int(args.MaxRounds)+1):
+for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
   for RWMix in RWMixes:
       for BS in BlockSizes:
         JSONFileName = ('fio_pass=' + str(TestPass) + '_rw=' + str(RWMix)
-                                                 + '_bs=' + str(BS) + '.json')
-        p = subprocess.Popen(['fio', '--output-format=json+', "--eta=always",
-                           '--name=job', '--filename=' + str(args.Device),
+                       + '_bs=' + str(BS) + '.json')
+        p = subprocess.Popen(['fio', '--filename=' + str(args.Device),
                            '--iodepth=' + str(OIO), '--numjobs=' + str(TC),
-                           '--bs=' + str(BS), '--ioengine=libaio',
-                           '--rw=randrw', '--rwmixread=' + str(RWMix),
-                           '--group_reporting', '--runtime=60', '--direct=1',
-                           '--norandommap', '--thread', '--refill_buffers',
-                           '--output=results/' + JSONFileName],
+                           '--bs=' + str(BS), '--ioengine=' + str(args.IOEngine),
+                           '--rwmixread=' + str(RWMix),
+                           '--output=results/' + JSONFileName] + FioArgs,
                            stdout=subprocess.PIPE,stderr=subprocess.PIPE,
                            universal_newlines=True)
   logging.info('Round ' + str(TestPass) + ' of ' + str(args.MaxRounds) + ' complete')
