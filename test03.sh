@@ -5,7 +5,7 @@
 
 #Throughtput Test
 
-readonly ROUNDS=15;
+readonly ROUNDS=10;
 readonly FIO="/usr/bin/fio"
 readonly TEST_NAME="03_Latency_test_SNIA"
 LOG_FILE=${TEST_NAME}/results/test.log
@@ -47,7 +47,7 @@ echo "$TIMESTAMP Running ${TEST_NAME} on device: $1" >> $LOG_FILE
 #sg_format --format $1
 #hdparm --user-master u --security-set-pass PasSWorD $1
 #hdparm --user-master u --security-erase PasSWorD $1
-nvme format $1
+#nvme format $1
 
 echo "$TIMESTAMP Purge done" >> $LOG_FILE
 

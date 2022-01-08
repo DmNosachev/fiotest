@@ -26,7 +26,7 @@ function find_prog(){
 }
 
 OIO=32;
-THREADS=16;
+THREADS=4;
 ROUNDS=10;
 #FIO=`find_prog /usr/local/bin/fio`>|| exit 1
 FIO="/usr/bin/fio"
