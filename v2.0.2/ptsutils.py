@@ -5,6 +5,40 @@ import os
 import sys
 import shutil
 from pathlib import Path
+from command_runner import command_runner
+import argparse
+
+def createCommonParser():
+  parser = argparse.ArgumentParser(description='SNIA PTS 2.0.2 IOPS Test')
+  parser.add_argument('-d','--device', help='Block level device to test',
+                      dest='Device', required=True)
+  parser.add_argument('-t','--device-type', default='sata', const='sata',
+                      nargs='?', dest='DevType',
+                      choices=['sata', 'sas', 'nvme', 'other'],
+                      help='Device type (sata/sas/nvme/other) \
+                      (default: %(default)s)',
+                      required=False)
+  parser.add_argument('-e','--engine', default='libaio', const='libaio',
+                      nargs='?', dest='IOEngine',
+                      choices=['libaio', 'windowsaio', 'io_uring', 'sg',
+                              'null', 'libiscsi'],
+                      help='Fio IO engine (libaio/windowsaio/io_uring/sg/ \
+                            null/libiscsi) \
+                      (default: %(default)s)',
+                      required=False)
+  parser.add_argument('-c','--pts-c', action='store_true', dest='PTSClMode',
+                      default=False, help='Use PTS Client settings',
+                      required=False)
+  parser.add_argument('-sp','--skip-precondition', action='store_true',
+                      dest='SkipPrecond', default=False,
+                      help='Skip preconditioning', required=False)
+  parser.add_argument('-se','--skip-erase', action='store_true',
+                      dest='SkipErase', default=False, help='Skip purge',
+                      required=False)
+  parser.add_argument('-r','--rounds', help='Maximum rounds in main test',
+                      dest='MaxRounds', default='10', type=int,
+                      choices=range(5, 25), required=False)
+  return parser
 
 def prepResultsDir(testName):
   dirpath = Path(testName) / 'results'
@@ -21,67 +55,35 @@ def devicePurge(devType, devName):
     if (not isProg('hdparm')):
       sys.exit('hdparm not found!')
 
-    out = subprocess.Popen(['hdparm', '--user-master', 'u', '--security-set-pass', 'PasSWorD', devName],
-    stdout=subprocess.PIPE,stderr=subprocess.PIPE, universal_newlines=True)
-    (stdout,stderr) = out.communicate()
-    if stderr != '':
-      logging.error("hdparm --security-set-pass encountered an error: " + stderr)
-      raise RuntimeError("hdparm error")
-
-    out = subprocess.Popen(['hdparm', '--user-master', 'u', '--security-erase', 'PasSWorD', devName],
-    stdout=subprocess.PIPE,stderr=subprocess.PIPE, universal_newlines=True)
-    (stdout,stderr) = out.communicate()
-    if stderr != '':
-      logging.error("hdparm --security-erase encountered an error: " + stderr)
-      raise RuntimeError("hdparm error")
+    exit_code, output = command_runner('hdparm --user-master u --security-set-pass PasSWorD ' + devName,
+                                       shell=True, live_output=True)
+    exit_code, output = command_runner('hdparm --user-master u --security-erase PasSWorD ' + devName,
+                                       shell=True, live_output=True)
   
   elif devType == 'sas':
     if (not isProg('sg_format')):
-      sys.exit('sg_format not found!')
-    out = subprocess.Popen(['sg_format', '--format', devName],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    (stdout,stderr) = out.communicate()
-    if stderr != '':
-      logging.error("sg_format encountered an error: " + stderr)
-      raise RuntimeError("sg_format error")
+      sys.exit('sg_format not found! Install sg3_utils package')
+    
+    exit_code, output = command_runner('sg_format --format' + devName,
+                                       shell=True, live_output=True)
 
   elif devType == 'nvme':
     if (not isProg('nvme')):
-      sys.exit('nvme not found! Install nvme-cli')
-    out = subprocess.Popen(['nvme', 'format', devName],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    (stdout,stderr) = out.communicate()
-    if stderr != '':
-      logging.error("NVMe CLI encountered an error: " + stderr)
-      raise RuntimeError("nvme cli error")
+      sys.exit('nvme not found! Install nvme-cli package')
+    
+    exit_code, output = command_runner('nvme format' + devName,
+                                      shell=True, live_output=True)
 
   else:
-    out = subprocess.Popen(['dd', 'if=/dev/zero', 'of=' + devName,
-                           'bs=128k'],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    (stdout,stderr) = out.communicate()
-    if stderr != '':
-      logging.error("dd encountered an error: " + stderr)
-      raise RuntimeError("dd error")
+    exit_code, output = command_runner('dd bs=128k if=/dev/zero of=' + devName,
+                                       shell=True, live_output=True)
     logging.info('Purging done (zeroing with dd)')
 
 def stdPrecond(devName):
   logging.info('Starting preconditioning')
-  p = subprocess.Popen(['fio', '--name=precondition', "--eta=always",
-                         '--filename=' + devName, '--iodepth=32',
-                         '--numjobs=1', '--bs=128k', '--ioengine=libaio',
-                         '--rw=write', '--group_reporting', '--direct=1',
-                         '--thread', '--refill_buffers', '--loops=2'],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True, bufsize=1)
-  for line in iter(p.stdout.readline, b''):
-    print(line)
-  p.stdout.close()
-  p.wait()
+  exit_code, output = command_runner('fio --name=precondition \
+                         --filename=' + devName + ' --iodepth=32 \
+                         --numjobs=1 --bs=128k --ioengine=libaio \
+                         --rw=write --group_reporting --direct=1 \
+                         --thread --refill_buffers --loops=2',
+                         timeout=14400)

@@ -10,7 +10,7 @@ import ptsutils as ptsu
 from tqdm import tqdm
 from command_runner import command_runner
 
-TestName = '01_WSAT'
+TestName = '03_LAT'
 
 try:
     os.remove(TestName + '.log')
@@ -27,21 +27,16 @@ args = parser.parse_args()
 if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
-OIO = 32
+BlockSizes = [512, 4096, 8192]
+RWMixes = [100, 65, 0]
+RoundTime = 60
 
-if args.PTSClMode:
-  TC = 2
-else:
-  TC = 4
-  
-BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
-RWMixes = [100, 95, 65, 50, 35, 5, 0]
-RoundTime = 10
-
-FioArgs = ['--output-format=json', '--eta=always',
+FioArgs = ['--output-format=json+', '--eta=always',
           '--name=job', '--rw=randrw', '--direct=1',
           '--norandommap', '--refill_buffers', 
-          '--thread', '--group_reporting']
+          '--thread', '--group_reporting',
+          '--random_generator=tausworthe64',
+          '--iodepth=1', '--numjobs=1']
 
 ptsu.prepResultsDir(TestName)
 
@@ -61,10 +56,22 @@ for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
                        + '_bs=' + str(BS) + '.json')
         exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                            ' --filename=' + str(args.Device) +
-                           ' --iodepth=' + str(OIO) + ' --numjobs=' + str(TC) +
                            ' --bs=' + str(BS) + ' --ioengine=' + str(args.IOEngine) +
                            ' --rwmixread=' + str(RWMix) +
                            ' --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
                            timeout=RoundTime + 5)
   logging.info('Round ' + str(TestPass) + ' of ' + str(args.MaxRounds) + ' complete')
+
+# 3.3 with added 100%-read test
+logging.info('Starting 20 min test')
+for RWMix in [100, 0]:
+  exit_code, output = command_runner('fio --name=20min' + str(RWMix) +
+                           ' --filename=' + devName + ' --iodepth=1 \
+                           --output-format=json+ --numjobs=1 --bs=4k --ramp_time=10 \
+                           --runtime=1200  --time_based --ioengine=libaio \
+                           --write_hist_log=test03' + str(RWMix) +
+                           ' --log_hist_msec=1 --disable_slat=1 --rw=randrw \
+                           --rwmixread=' + str(RWMix) + ' --group_reporting --direct=1 \
+                           --thread --refill_buffers --random_generator=tausworthe64',
+                           timeout=RoundTime + 5)
