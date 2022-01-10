@@ -22,9 +22,9 @@ iops_data = pd.read_csv(filename, sep = ';', header=0)
 
 iops_data.replace(to_replace={100 : '100/0', 95 : '95/5', 65 : '65/35', 50 : '50/50', 35 : '35/65', 5 : '5/95', 0 : '0/100'}, inplace=True)
 
-iops_data.replace(to_replace={4096 : '4K', 8192 : '8K', 16384 : '16K', 32768 : '32K', 65536 : '64K', 131072 : '128K', 1048576 : '1M'}, inplace=True)
+iops_data.replace(to_replace={512 : '512 Б', 4096 : '4 КиБ', 8192 : '8 КиБ', 16384 : '16 КиБ', 32768 : '32 КиБ', 65536 : '64 КиБ', 131072 : '128 КиБ', 1048576 : '1 МиБ'}, inplace=True)
 
-iops_plot = sns.relplot(x='BS', y='IOPS', hue='RWMIX', sort=False, kind='line', marker="o", data=iops_data, palette=sns.color_palette('cubehelix', 7))
+iops_plot = sns.relplot(x='BS', y='IOPS', hue='RWMIX', sort=False, kind='line', marker="o", data=iops_data, palette=sns.color_palette('nipy_spectral', 7))
 
 iops_plot.fig.set_figwidth(8)
 iops_plot.fig.set_figheight(4)
@@ -36,3 +36,4 @@ iops_plot.set(yticks=[1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 1000
 
 iops_plot.savefig(str(args.device_name) + '_iops2d.svg', format='svg', transparent=True)
 iops_plot.savefig(str(args.device_name) + '_iops2d.png', format='png')
+iops_plot.savefig(str(args.device_name) + '_iops2d.pdf', format='pdf')
