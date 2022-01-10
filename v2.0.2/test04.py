@@ -72,7 +72,7 @@ for TestPass in tqdm(range(1, WSATRounds+1)):
 logging.info('Starting 20 min test')
 
 exit_code, output = command_runner('fio --name=20min --filename=' +
-                         devName + ' --iodepth=' + str(OIO) +
+                         str(args.Device) + ' --iodepth=' + str(OIO) +
                          ' --output-format=json+ --numjobs=' + str(TC) +
                          ' --bs=4k --ramp_time=10 --runtime=1200 \
                          --time_based --ioengine=libaio \

@@ -70,7 +70,7 @@ BS = '1m'
 
 logging.info('Starting preconditioning' + ' (' + BS + ')')
   exit_code, output = command_runner('fio --name=precondition1M \
-                         --filename=' + devName + ' --iodepth=32 \
+                         --filename=' + str(args.Device) + ' --iodepth=32 \
                          --numjobs=1 --bs=' + BS + ' --ioengine=libaio \
                          --rw=write --group_reporting --direct=1 \
                          --thread --refill_buffers --loops=2',

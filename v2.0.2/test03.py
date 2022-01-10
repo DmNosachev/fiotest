@@ -66,12 +66,12 @@ for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
 # 3.3 with added 100%-read test
 logging.info('Starting 20 min test')
 for RWMix in [100, 0]:
-  exit_code, output = command_runner('fio --name=20min' + str(RWMix) +
-                           ' --filename=' + devName + ' --iodepth=1 \
-                           --output-format=json+ --numjobs=1 --bs=4k --ramp_time=10 \
-                           --runtime=1200  --time_based --ioengine=libaio \
-                           --write_hist_log=test03' + str(RWMix) +
-                           ' --log_hist_msec=1 --disable_slat=1 --rw=randrw \
-                           --rwmixread=' + str(RWMix) + ' --group_reporting --direct=1 \
-                           --thread --refill_buffers --random_generator=tausworthe64',
-                           timeout=RoundTime + 5)
+  JSONFileName = ('fio_20min_rw=' + str(RWMix) + '.json')
+  exit_code, output = command_runner('fio --runtime=1200 --filename=' + 
+                           str(args.Device) + ' --bs=4k --ioengine=' +
+                           str(args.IOEngine) + ' --rwmixread=' + str(RWMix) + 
+                           ' --write_hist_log=' + TestName + '/results/test03' +
+                           str(RWMix) + ' --log_hist_msec=1 --disable_slat=1 \
+                           --output=' + TestName + '/results/' + JSONFileName +
+                           ' ' + ' '.join(FioArgs),
+                           timeout=1300)
