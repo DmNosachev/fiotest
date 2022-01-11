@@ -67,8 +67,9 @@ for TestPass in tqdm(range(1, PrecondRounds+1)):
 print('Staring main test')
 logging.info('Starting test: ' + TestName)
 for TestPass in tqdm(range(1, args.MaxRounds+1)):
-  for IRPWPass in tqdm(range(1, IRPWRounds+1)):
-    JSONFileNamePW = ('fio_pw_pass=' + str(IRPWPass) + '.json')
+  for IRPWPass in range(1, IRPWRounds+1):
+    JSONFileNamePW = ('fio_pw_pass=' + str(IRPWPass) + '_test_pass=' + 
+                      str(args.MaxRounds) + '.json')
     exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                              ' --filename=' + str(args.Device) +
                              ' --ioengine=' + str(args.IOEngine) +
