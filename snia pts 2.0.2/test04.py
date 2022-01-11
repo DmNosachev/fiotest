@@ -66,7 +66,7 @@ for TestPass in tqdm(range(1, WSATRounds+1)):
                            ' --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
                            timeout=RoundTime + 5)
-  logging.info('Round ' + str(TestPass) + ' of ' + str(args.MaxRounds) + ' complete')
+  logging.info('Round ' + str(TestPass) + ' of ' + str(WSATRounds) + ' complete')
 
 # 10.2.4
 logging.info('Starting 20 min test')
