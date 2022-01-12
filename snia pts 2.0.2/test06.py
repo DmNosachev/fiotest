@@ -9,8 +9,9 @@ import shutil
 import ptsutils as ptsu
 from tqdm import tqdm
 from command_runner import command_runner
+import time
 
-TestName = '04_WSAT'
+TestName = '06_XSR'
 
 try:
     os.remove(TestName + '.log')
@@ -27,23 +28,19 @@ args = parser.parse_args()
 if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
-if args.PTSClMode:
-  OIO = 16
-  TC = 2
-else:
-  OIO = 32
-  TC = 4
+OIO = 32
+TC = 1
   
 RoundTime = 60
-WSATRounds = 360
-RTHTime = 1200
+SeqRounds = 360
+RndRounds = 480
 
 FioArgs = ['--output-format=json', '--eta=always',
-          '--name=job', '--rw=randwrite', '--direct=1',
+          '--name=job', '--direct=1',
           '--norandommap', '--refill_buffers', 
           '--thread', '--group_reporting',
           '--random_generator=tausworthe64',
-          '--time_based', '--bs=4k']
+          '--rw=randwrite']
 
 ptsu.prepResultsDir(TestName)
 
@@ -53,32 +50,45 @@ if not args.SkipErase:
 
 # There is no preconditioning
 
-# 10.2.2
 logging.info('Starting test: ' + TestName)
-for TestPass in tqdm(range(1, WSATRounds+1)):
-  JSONFileName = ('fio_pass=' + str(TestPass) + '.json')
+logging.info('Starting AG1')
+for TestPass in tqdm(range(1, SeqRounds+1)):
+  JSONFileName = ('fio_ag1_pass=' + str(TestPass) + '.json')
   exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                ' --filename=' + str(args.Device) +
                ' --ioengine=' + str(args.IOEngine) +
                ' --numjobs=' + str(TC) +
                ' --iodepth=' + str(OIO) +
+               ' --rw=write --bs=1m'
                ' --output=' + TestName + '/results/' + JSONFileName +
                ' ' + ' '.join(FioArgs),
                timeout=RoundTime + 5)
-  logging.info('Round ' + str(TestPass) + ' of ' + str(WSATRounds) + ' complete')
+  logging.info('AG1: round ' + str(TestPass) + ' of ' + str(SeqRounds) + ' complete')
 
-# 10.2.4
-logging.info('Starting RTH test')
-
-JSONFileName = ('fio_rth.json')
-exit_code, output = command_runner('fio --runtime=' + str(RTHTime) +
+logging.info('Starting AG2')
+for TestPass in tqdm(range(1, RndRounds+1)):
+  JSONFileName = ('fio_ag2_pass=' + str(TestPass) + '.json')
+  exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                ' --filename=' + str(args.Device) +
                ' --ioengine=' + str(args.IOEngine) +
                ' --numjobs=' + str(TC) +
                ' --iodepth=' + str(OIO) +
-               ' --write_lat_log=' + TestName + '/results/test04' + 
-               ' --log_avg_msec=0.2 --disable_slat=1' +
+               ' --rw=randwrite --bs=8k'
                ' --output=' + TestName + '/results/' + JSONFileName +
                ' ' + ' '.join(FioArgs),
-               timeout=RTHTime + 100)
-logging.info('Round ' + str(TestPass) + ' of ' + str(WSATRounds) + ' complete')
+               timeout=RoundTime + 5)
+  logging.info('AG2: round ' + str(TestPass) + ' of ' + str(RndRounds) + ' complete')
+  
+logging.info('Starting AG3')
+for TestPass in tqdm(range(1, SeqRounds+1)):
+  JSONFileName = ('fio_ag3_pass=' + str(TestPass) + '.json')
+  exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
+               ' --filename=' + str(args.Device) +
+               ' --ioengine=' + str(args.IOEngine) +
+               ' --numjobs=' + str(TC) +
+               ' --iodepth=' + str(OIO) +
+               ' --rw=write --bs=1m'
+               ' --output=' + TestName + '/results/' + JSONFileName +
+               ' ' + ' '.join(FioArgs),
+               timeout=RoundTime + 5)
+  logging.info('AG3: round ' + str(TestPass) + ' of ' + str(SeqRounds) + ' complete')

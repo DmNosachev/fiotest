@@ -9,6 +9,7 @@ import shutil
 import ptsutils as ptsu
 from tqdm import tqdm
 from command_runner import command_runner
+import time
 
 TestName = '05_HIR'
 
@@ -27,8 +28,6 @@ args = parser.parse_args()
 if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
-
-
 if args.PTSClMode:
   OIO = 16
   TC = 2
@@ -36,18 +35,19 @@ else:
   OIO = 32
   TC = 4
   
-BlockSizes = [512, 4096, 8192]
-RWMixes = [100, 65, 0]
 RoundTime = 60
+PCRounds = 36
+StateRounds = 360
 
-WSATRounds = 360
+SleepIntervals = [5, 10, 15, 25, 50]
+WLTime = 5
 
-FioArgs = ['--output-format=json+', '--eta=always',
+FioArgs = ['--output-format=json', '--eta=always',
           '--name=job', '--rw=randwrite', '--direct=1',
           '--norandommap', '--refill_buffers', 
           '--thread', '--group_reporting',
           '--random_generator=tausworthe64',
-          '--numjobs=1 --bs=4k']
+          '--bs=4k', '--rw=randwrite']
 
 ptsu.prepResultsDir(TestName)
 
@@ -55,29 +55,33 @@ if not args.SkipErase:
   ptsu.devicePurge(str(args.DevType), str(args.Device))
   logging.info('Purge done')
 
+#Special preconditioning
+logging.info('Starting preconditioning')
+for TestPass in tqdm(range(1, PCRounds+1)):
+  JSONFileName = ('fio_pc_pass=' + str(TestPass) + '.json')
+  exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
+                     ' --filename=' + str(args.Device) +
+                     ' --ioengine=' + str(args.IOEngine) +
+                     ' --numjobs=' + str(TC) +
+                     ' --iodepth=' + str(OIO) +
+                     ' --output=' + TestName + '/results/' + JSONFileName +
+                     ' ' + ' '.join(FioArgs),
+                     timeout=RoundTime + 5)
+  logging.info('Preconditioning: round ' + str(TestPass) +
+               ' of ' + str(PCRounds) + ' complete')
+
 logging.info('Starting test: ' + TestName)
-for TestPass in tqdm(range(1, WSATRounds+1)):
-  for RWMix in RWMixes:
-      for BS in BlockSizes:
-        JSONFileName = ('fio_pass=' + str(TestPass) + '.json')
-        exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
-                           ' --filename=' + str(args.Device) +
-                           ' --ioengine=' + str(args.IOEngine) +
-                           ' --output=' + TestName + '/results/' + JSONFileName +
-                           ' ' + ' '.join(FioArgs),
-                           timeout=RoundTime + 5)
-  logging.info('Round ' + str(TestPass) + ' of ' + str(WSATRounds) + ' complete')
-
-# 10.2.4
-logging.info('Starting 20 min test')
-
-exit_code, output = command_runner('fio --name=20min --filename=' +
-                         str(args.Device) + ' --iodepth=' + str(OIO) +
-                         ' --output-format=json+ --numjobs=' + str(TC) +
-                         ' --bs=4k --ramp_time=10 --runtime=1200 \
-                         --time_based --ioengine=libaio \
-                         --write_hist_log=test04' +
-                         ' --log_hist_msec=1 --disable_slat=1 \
-                         --rw=randwrite --group_reporting --direct=1 \
-                         --thread --refill_buffers --random_generator=tausworthe64',
-                         timeout=RoundTime + 5)
+for SleepTime in SleepIntervals
+  for TestPass in range(1, StateRounds+1)):
+    JSONFileName = ('fio_st=' + str(SleepTime) + '_pass=' + str(TestPass) + '.json')
+    exit_code, output = command_runner('fio --runtime=' + str(WLTime) +
+                     ' --filename=' + str(args.Device) +
+                     ' --ioengine=' + str(args.IOEngine) +
+                     ' --numjobs=' + str(TC) +
+                     ' --iodepth=' + str(OIO) +
+                     ' --output=' + TestName + '/results/' + JSONFileName +
+                     ' ' + ' '.join(FioArgs),
+                     timeout=WLTime + SleepTime + 5)
+    time.sleep(SleepTime)
+    logging.info('State ' + str(SleepTime) + ': round ' + str(TestPass) +
+                 ' of ' + str(StateRounds) + ' complete')                 
