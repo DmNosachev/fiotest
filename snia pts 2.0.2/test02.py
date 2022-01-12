@@ -35,7 +35,8 @@ RoundTime = 60
 FioArgs = ['--output-format=json', '--eta=always',
           '--name=job', '--rw=randrw', '--direct=1',
           '--norandommap', '--refill_buffers', 
-          '--thread', '--group_reporting', '--numjobs=1',
+          '--thread', '--group_reporting',
+          '--time_based', '--numjobs=1',
           ]
 
 ptsu.prepResultsDir(TestName)

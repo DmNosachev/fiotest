@@ -31,11 +31,12 @@ BlockSizes = [512, 4096, 8192]
 RWMixes = [100, 65, 0]
 RoundTime = 60
 
-FioArgs = ['--output-format=json+', '--eta=always',
+FioArgs = ['--output-format=json', '--eta=always',
           '--name=job', '--rw=randrw', '--direct=1',
           '--norandommap', '--refill_buffers', 
           '--thread', '--group_reporting',
           '--random_generator=tausworthe64',
+          '--time_based',
           '--iodepth=1', '--numjobs=1']
 
 ptsu.prepResultsDir(TestName)
