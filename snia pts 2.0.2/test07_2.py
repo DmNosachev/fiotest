@@ -49,23 +49,24 @@ if not args.SkipErase:
   ptsu.devicePurge(str(args.DevType), str(args.Device))
   logging.info('Purge done')
 
-# Special preconditioning
-print('Staring preconditioning')
-for TestPass in tqdm(range(1, PrecondRounds+1)):
-  JSONFileName = ('fio_pc_pass=' + str(TestPass) + '.json')
-  exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
-                           ' --filename=' + str(args.Device) +
-                           ' --ioengine=' + str(args.IOEngine) +
-                           ' --numjobs=32 --iodepth=32 \
-                           --rw=randwrite' +
-                           ' --output=' + TestName + '/results/' + JSONFileName +
-                           ' ' + ' '.join(FioArgs),
-                           timeout=RoundTime + 5)
-  logging.info('Preconditioning round ' + str(TestPass) + ' of ' +
-               str(PrecondRounds) + ' complete')
+if not args.SkipPrecond:
+  # Special preconditioning
+  print('Starting preconditioning')
+  for TestPass in tqdm(range(1, PrecondRounds+1)):
+    JSONFileName = ('fio_pc_pass=' + str(TestPass) + '.json')
+    exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
+                             ' --filename=' + str(args.Device) +
+                             ' --ioengine=' + str(args.IOEngine) +
+                             ' --numjobs=32 --iodepth=32 \
+                             --rw=randwrite' +
+                             ' --output=' + TestName + '/results/' + JSONFileName +
+                             ' ' + ' '.join(FioArgs),
+                             timeout=RoundTime + 5)
+    logging.info('Preconditioning round ' + str(TestPass) + ' of ' +
+                 str(PrecondRounds) + ' complete')
 
 for HistName, TC, QD in zip(HistNames, TCSet, QDSet): 
-  print('Staring test: ' + HistName)
+  print('Starting test: ' + HistName)
       JSONFileName = ('fio_' + HistName + '.json')
       exit_code, output = command_runner('fio --runtime=600 \
                                --filename=' + str(args.Device) +

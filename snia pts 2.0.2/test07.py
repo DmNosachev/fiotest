@@ -49,22 +49,23 @@ if not args.SkipErase:
   ptsu.devicePurge(str(args.DevType), str(args.Device))
   logging.info('Purge done')
 
-# Special preconditioning
-print('Staring preconditioning')
-for TestPass in tqdm(range(1, PrecondRounds+1)):
-  JSONFileName = ('fio_pc_pass=' + str(TestPass) + '.json')
-  exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
-                           ' --filename=' + str(args.Device) +
-                           ' --ioengine=' + str(args.IOEngine) +
-                           ' --numjobs=32 --iodepth=32' +
-                           '--rw=randwrite' +
-                           ' --output=' + TestName + '/results/' + JSONFileName +
-                           ' ' + ' '.join(FioArgs),
-                           timeout=RoundTime + 5)
-  logging.info('Preconditioning round ' + str(TestPass) + ' of ' +
-               str(PrecondRounds) + ' complete')
+if not args.SkipPrecond:
+  # Special preconditioning
+  print('Starting preconditioning')
+  for TestPass in tqdm(range(1, PrecondRounds+1)):
+    JSONFileName = ('fio_pc_pass=' + str(TestPass) + '.json')
+    exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
+                             ' --filename=' + str(args.Device) +
+                             ' --ioengine=' + str(args.IOEngine) +
+                             ' --numjobs=32 --iodepth=32' +
+                             '--rw=randwrite' +
+                             ' --output=' + TestName + '/results/' + JSONFileName +
+                             ' ' + ' '.join(FioArgs),
+                             timeout=RoundTime + 5)
+    logging.info('Preconditioning round ' + str(TestPass) + ' of ' +
+                 str(PrecondRounds) + ' complete')
 
-print('Staring main test')
+print('Starting main test')
 logging.info('Starting test: ' + TestName)
 for TestPass in tqdm(range(1, args.MaxRounds+1)):
   for IRPWPass in range(1, IRPWRounds+1):
