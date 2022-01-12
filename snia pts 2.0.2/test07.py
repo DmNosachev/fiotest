@@ -10,7 +10,7 @@ import ptsutils as ptsu
 from tqdm import tqdm
 from command_runner import command_runner
 
-TestName = '06_CBW'
+TestName = '07_CBW'
 
 try:
     os.remove(TestName + '.log')
@@ -27,17 +27,16 @@ args = parser.parse_args()
 if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
-QDSet = [32, 16, 8, 4, 2 , 1]
-TCSet = [32, 16, 8, 4, 2 , 1]
+TCSet = [32, 16, 8, 4, 2, 1]
+QDSet = [32, 16, 8, 4, 2, 1]
 
-RWMixes = [100, 65, 0]
 RoundTime = 60
 
-PrecondRounds = 36
+PrecondRounds = 10
 IRPWRounds = 10
 
 FioArgs = ['--output-format=json+', '--eta=always',
-          '--name=job', '--rw=randwrite', '--direct=1',
+          '--name=job', '--direct=1',
           '--norandommap', '--refill_buffers', 
           '--thread', '--group_reporting',
           '--random_generator=tausworthe64',
@@ -58,6 +57,7 @@ for TestPass in tqdm(range(1, PrecondRounds+1)):
                            ' --filename=' + str(args.Device) +
                            ' --ioengine=' + str(args.IOEngine) +
                            ' --numjobs=32 --iodepth=32' +
+                           '--rw=randwrite' +
                            ' --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
                            timeout=RoundTime + 5)
@@ -74,6 +74,7 @@ for TestPass in tqdm(range(1, args.MaxRounds+1)):
                              ' --filename=' + str(args.Device) +
                              ' --ioengine=' + str(args.IOEngine) +
                              ' --numjobs=32 --iodepth=32' +
+                             '--rw=randwrite' +
                              ' --output=' + TestName + '/results/' + JSONFileNamePW +
                              ' ' + ' '.join(FioArgs),
                              timeout=RoundTime + 5)
@@ -87,8 +88,9 @@ for TestPass in tqdm(range(1, args.MaxRounds+1)):
         exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                            ' --filename=' + str(args.Device) +
                            ' --ioengine=' + str(args.IOEngine) +
-                           ' --numjobs=' + str(QD) +
-                           ' --iodepth=32' + str(TC) +
+                           ' --numjobs=' + str(TC) +
+                           ' --iodepth=' + str(QD) +
+                           '--rw=randrw --rwmixread=40' +
                            ' --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
                            timeout=RoundTime + 5)

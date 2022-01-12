@@ -70,8 +70,8 @@ for RWMix in [100, 0]:
   exit_code, output = command_runner('fio --runtime=1200 --filename=' + 
                            str(args.Device) + ' --bs=4k --ioengine=' +
                            str(args.IOEngine) + ' --rwmixread=' + str(RWMix) + 
-                           ' --write_hist_log=' + TestName + '/results/test03' +
-                           str(RWMix) + ' --log_hist_msec=1 --disable_slat=1 \
+                           ' --write_lat_log=' + TestName + '/results/test03' +
+                           str(RWMix) + ' --log_avg_msec=0.1 --disable_slat=1 \
                            --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
                            timeout=1300)

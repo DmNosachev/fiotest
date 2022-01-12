@@ -1,4 +1,3 @@
-from shutil import which
 import subprocess
 import logging
 import os
