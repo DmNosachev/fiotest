@@ -28,8 +28,8 @@ if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
 HistNames = ['Min', 'Mid', 'Max']
-TCSet = [1, 2, 8]
-QDSet = [1, 2, 1]
+TCSet = [1, 2, 32]
+QDSet = [1, 16, 32]
 
 RoundTime = 60
 
@@ -67,17 +67,17 @@ if not args.SkipPrecond:
 
 for HistName, TC, QD in zip(HistNames, TCSet, QDSet): 
   print('Starting test: ' + HistName)
-      JSONFileName = ('fio_' + HistName + '.json')
-      exit_code, output = command_runner('fio --runtime=600 \
-                               --filename=' + str(args.Device) +
-                               ' --ioengine=' + str(args.IOEngine) +
-                               ' --numjobs=' + str(TC) +
-                               ' --iodepth=' + str(QD) +
-                               '--rw=randwrite' +
-                               ' --write_lat_log=' + TestName +
-                               '/results/test07_' + HistName +
-                               ' --log_avg_msec=0.2 --disable_slat=1 \
-                               --output=' + TestName + '/results/' + JSONFileName +
-                               ' ' + ' '.join(FioArgs),
-                               timeout=RoundTime + 5)
-      logging.info(HistName + ' complete')
+  JSONFileName = ('fio_' + HistName + '.json')
+  exit_code, output = command_runner('fio --runtime=600 \
+                           --filename=' + str(args.Device) +
+                           ' --ioengine=' + str(args.IOEngine) +
+                           ' --numjobs=' + str(TC) +
+                           ' --iodepth=' + str(QD) +
+                           '--rw=randwrite' +
+                           ' --write_lat_log=' + TestName +
+                           '/results/test07_' + HistName +
+                           ' --log_avg_msec=0.2 --disable_slat=1 \
+                           --output=' + TestName + '/results/' + JSONFileName +
+                           ' ' + ' '.join(FioArgs),
+                           timeout=RoundTime + 5)
+  logging.info(HistName + ' complete')
