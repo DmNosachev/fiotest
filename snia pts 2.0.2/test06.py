@@ -33,7 +33,7 @@ TC = 1
   
 RoundTime = 60
 SeqRounds = 360
-RndRounds = 480
+RndRounds = 380
 
 FioArgs = ['--output-format=json', '--eta=always',
           '--name=job', '--direct=1',

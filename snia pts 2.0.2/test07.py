@@ -57,8 +57,8 @@ if not args.SkipPrecond:
     exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                              ' --filename=' + str(args.Device) +
                              ' --ioengine=' + str(args.IOEngine) +
-                             ' --numjobs=32 --iodepth=32' +
-                             '--rw=randwrite' +
+                             ' --numjobs=32 --iodepth=32 \
+                             --rw=randwrite' +
                              ' --output=' + TestName + '/results/' + JSONFileName +
                              ' ' + ' '.join(FioArgs),
                              timeout=RoundTime + 5)
@@ -74,8 +74,8 @@ for TestPass in tqdm(range(1, args.MaxRounds+1)):
     exit_code, output = command_runner('fio --runtime=' + str(RoundTime) +
                              ' --filename=' + str(args.Device) +
                              ' --ioengine=' + str(args.IOEngine) +
-                             ' --numjobs=32 --iodepth=32' +
-                             '--rw=randwrite' +
+                             ' --numjobs=32 --iodepth=32 \
+                             --rw=randwrite' +
                              ' --output=' + TestName + '/results/' + JSONFileNamePW +
                              ' ' + ' '.join(FioArgs),
                              timeout=RoundTime + 5)

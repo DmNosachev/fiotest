@@ -28,8 +28,8 @@ if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
 HistNames = ['Min', 'Mid', 'Max']
-TCSet = [1, 2, 32]
-QDSet = [1, 16, 32]
+TCSet = [1, 4, 16]
+QDSet = [1, 2, 8]
 
 RoundTime = 60
 
@@ -73,11 +73,11 @@ for HistName, TC, QD in zip(HistNames, TCSet, QDSet):
                            ' --ioengine=' + str(args.IOEngine) +
                            ' --numjobs=' + str(TC) +
                            ' --iodepth=' + str(QD) +
-                           '--rw=randwrite' +
+                           ' --rw=randrw --rwmixread=60' +
                            ' --write_lat_log=' + TestName +
-                           '/results/test07_' + HistName +
-                           ' --log_avg_msec=0.2 --disable_slat=1 \
+                           '/results/test07_' + HistName + '_RTH \
+                           --log_avg_msec=1 --disable_slat=1 \
                            --output=' + TestName + '/results/' + JSONFileName +
                            ' ' + ' '.join(FioArgs),
-                           timeout=RoundTime + 5)
+                           timeout=1200)
   logging.info(HistName + ' complete')
