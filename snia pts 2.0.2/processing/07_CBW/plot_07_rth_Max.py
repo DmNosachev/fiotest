@@ -18,7 +18,7 @@ TCSet = [1, 2, 32]
 QDSet = [1, 16, 32]
 CSVFileList = []
 for i in range(1, 32+1):
-CSVFileList.append('results/test07_Max_RTH_clat.' + i +'.log')
+  CSVFileList.append('results/test07_Max_RTH_clat.' + i +'.log')
                
 rth_data0 = pd.concat((pd.read_csv(f, sep = ',',
                       usecols=[1], names=['Lat']) for f in CSVFileList),

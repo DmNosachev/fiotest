@@ -28,11 +28,6 @@ if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
 OIO = 32
-
-if args.PTSClMode:
-  TC = 2
-else:
-  TC = 4
   
 BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
 RWMixes = [100, 95, 65, 50, 35, 5, 0]
@@ -44,6 +39,13 @@ FioArgs = ['--output-format=json', '--eta=always',
           '--time_based',
           '--thread', '--group_reporting']
 
+if args.PTSClMode:
+  logging.info('Client mode selected')
+  TC = 2
+  FioArgs.append('--size=' + str(ptsu.getDeviceSize(str(round(args.Device * 0.75)))))
+else:
+  TC = 4
+  
 ptsu.prepResultsDir(TestName)
 
 if not args.SkipErase:
@@ -53,7 +55,7 @@ if not args.SkipErase:
 if not args.SkipPrecond:
   ptsu.stdPrecond(str(args.Device))
   logging.info('Preconditioning done')
-
+  
 logging.info('Starting test: ' + TestName)
 for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
   for RWMix in RWMixes:

@@ -17,7 +17,7 @@ processing_name = 'test04_main'
 DriveCapacityGiB = args.device_cap_bytes / 1073741824
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-results_path = "results"
+results_path = 'results'
 
 def silentremove(filename):
   try:

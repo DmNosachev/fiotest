@@ -27,9 +27,18 @@ args = parser.parse_args()
 if (not ptsu.isProg('fio')):
   sys.exit('fio not found! https://github.com/axboe/fio')
 
+FioArgs = ['--output-format=json', '--eta=always',
+          '--name=job', '--rw=randwrite', '--direct=1',
+          '--norandommap', '--refill_buffers', 
+          '--thread', '--group_reporting',
+          '--random_generator=tausworthe64',
+          '--time_based', '--bs=4k']
+          
 if args.PTSClMode:
+  logging.info('Client mode selected')
   OIO = 16
   TC = 2
+  FioArgs.append('--size=' + str(ptsu.getDeviceSize(str(round(args.Device * 0.75)))))
 else:
   OIO = 32
   TC = 4
@@ -37,13 +46,6 @@ else:
 RoundTime = 60
 WSATRounds = 360
 RTHTime = 1200
-
-FioArgs = ['--output-format=json', '--eta=always',
-          '--name=job', '--rw=randwrite', '--direct=1',
-          '--norandommap', '--refill_buffers', 
-          '--thread', '--group_reporting',
-          '--random_generator=tausworthe64',
-          '--time_based', '--bs=4k']
 
 ptsu.prepResultsDir(TestName)
 
@@ -77,7 +79,7 @@ exit_code, output = command_runner('fio --runtime=' + str(RTHTime) +
                ' --numjobs=' + str(TC) +
                ' --iodepth=' + str(OIO) +
                ' --write_lat_log=' + TestName + '/results/test04' + 
-               ' --log_avg_msec=0.2 --disable_slat=1' +
+               ' --log_avg_msec=0.1 --disable_slat=1' +
                ' --output=' + TestName + '/results/' + JSONFileName +
                ' ' + ' '.join(FioArgs),
                timeout=RTHTime + 100)

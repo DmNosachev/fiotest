@@ -7,6 +7,17 @@ from pathlib import Path
 from command_runner import command_runner
 import argparse
 
+FioCommonArgs = ['--output-format=json',
+                 '--eta=always',
+                 '--name=job',
+                 '--direct=1',
+                 '--norandommap',
+                 '--refill_buffers', 
+                 '--thread',
+                 '--group_reporting',
+                 '--random_generator=tausworthe64',
+                 '--time_based']
+          
 def createCommonParser():
   parser = argparse.ArgumentParser(description='SNIA PTS 2.0.2 IOPS Test')
   parser.add_argument('-d','--device', help='Block level device to test',
@@ -44,10 +55,24 @@ def prepResultsDir(testName):
   if dirpath.exists() and dirpath.is_dir():
       shutil.rmtree(dirpath)
   dirpath.mkdir(parents=True)
+  
+  try:
+    os.remove(TestName + '.log')
+  except OSError:
+    pass
 
 def isProg(progName):
   return which(progName) is not None
 
+# Get the file size by seeking at end. Taken from SO: https://stackoverflow.com/questions/2773604/query-size-of-block-device-file-in-python
+
+def getDeviceSize(devName):
+    fd=os.open(devName, os.O_RDONLY)
+    try:
+        return os.lseek(fd, 0, os.SEEK_END)
+    finally:
+        os.close(fd)
+        
 def devicePurge(devType, devName):
   logging.info('Purging device ' + devName)
   if devType == 'sata':

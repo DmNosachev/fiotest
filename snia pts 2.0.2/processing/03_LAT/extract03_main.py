@@ -76,5 +76,5 @@ with open(CSVFileName , mode='w') as CSVFile:
       TestRoundWriter.writerow([BS, RWMix, int(round(Average(IOPSList))),
                                round(Average(LatList),2),
                                round(Average(LatP4nList),2),
-                               round(Average(LatMaxList),2)])
+                               round(max(LatMaxList),2)])
   CSVFile.close()
