@@ -10,8 +10,8 @@ def checkSteadyState(testName, ss_df, xSel, ySel, plotName, plotFormats):
   y = ss_df[ySel].tolist()
   coef = np.polyfit(x, y, 1)
   poly1d_fn = np.poly1d(coef)
-  slope_prc = 100*((abs(coef[0])/poly1d_fn(x[4])) / (1/4))
-  
+  slope_prc = 100*(abs(coef[0]/poly1d_fn(x[4])) / (1/4))
+
   print('Steady state check for ' + testName + ':')
   if ((max(y) - min(y)) >= av_ss*0.2):
     print('Maximum data excursion check failed')
