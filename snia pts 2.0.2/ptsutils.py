@@ -88,7 +88,7 @@ def devicePurge(devType, devName):
     if (not isProg('sg_format')):
       sys.exit('sg_format not found! Install sg3_utils package')
     
-    exit_code, output = command_runner('sg_format --format' + devName,
+    exit_code, output = command_runner('sg_format --format ' + devName,
                                        shell=True, live_output=True)
 
   elif devType == 'nvme':
