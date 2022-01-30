@@ -29,7 +29,7 @@ print('Min-IOPS read latency stats:')
 print(f'Mean = {Lat_mean:.2f}, 99.9% = {Lat_p3n:.2f}, \
 99.99% = {Lat_p4n:.2f}, 99.999% = {Lat_p5n:.2f}' + '\n')
 
-rth_plot0 = sns.histplot(data=rth_data0, x='Lat', log_scale=[True, True])
+rth_plot0 = sns.histplot(data=rth_data0, x='Lat', element="poly", log_scale=[True, True])
 plt.axvline(x=Lat_mean, label='Mean: ' + str(round(Lat_mean, 2)), linestyle='dotted', color='tab:green')
 plt.axvline(x=Lat_p3n, label='99.9%: ' + str(round(Lat_p3n, 2)), linestyle='dashed', color='tab:purple')
 plt.axvline(x=Lat_p4n, label='99.99%: ' + str(round(Lat_p4n, 2)), linestyle='dashdot', color='tab:cyan')

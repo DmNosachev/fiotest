@@ -57,12 +57,12 @@ def prepResultsDir(testName):
   dirpath.mkdir(parents=True)
   
   try:
-    os.remove(TestName + '.log')
+    os.remove(testName + '.log')
   except OSError:
     pass
 
 def isProg(progName):
-  return which(progName) is not None
+  return shutil.which(progName) is not None
 
 # Get the file size by seeking at end. Taken from SO: https://stackoverflow.com/questions/2773604/query-size-of-block-device-file-in-python
 
