@@ -33,11 +33,8 @@ BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
 RWMixes = [100, 95, 65, 50, 35, 5, 0]
 RoundTime = 10
 
-FioArgs = ['--output-format=json', '--eta=always',
-          '--name=job', '--rw=randrw', '--direct=1',
-          '--norandommap', '--refill_buffers',
-          '--time_based',
-          '--thread', '--group_reporting']
+FioArgs = ptsu.FioCommonArgs
+FioArgs.append('--rw=randrw')
 
 if args.PTSClMode:
   logging.info('Client mode selected')
