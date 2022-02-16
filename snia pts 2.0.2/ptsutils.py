@@ -95,7 +95,7 @@ def devicePurge(devType, devName):
     if (not isProg('nvme')):
       sys.exit('nvme not found! Install nvme-cli package')
     
-    exit_code, output = command_runner('nvme format' + devName,
+    exit_code, output = command_runner('nvme format ' + devName,
                                       shell=True, live_output=True)
 
   else:
