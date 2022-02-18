@@ -13,7 +13,7 @@ args = parser.parse_args()
 
 plt.rc('font', size=8)
 
-rth_data100 = pd.read_csv('test03100_clat.1.log', sep = ',',
+rth_data100 = pd.read_csv('test03_100_clat.1.log', sep = ',',
                       usecols=[1], names=['Lat'])
 rth_data100.Lat = rth_data100.Lat.multiply(0.001)
 
@@ -32,7 +32,7 @@ plt.axvline(x=Lat_100_p4n, label='99.99%: ' + str(round(Lat_100_p4n, 2)), linest
 plt.axvline(x=Lat_100_p5n, label='99.999%: ' + str(round(Lat_100_p5n, 2)), linestyle='solid', color='tab:orange')
 plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 rth_plot100.set(xlabel='Latency, µs')
-rth_plot100.set_xlim(10, 10000)
+#rth_plot100.set_xlim(10, 10000)
 
 fig = rth_plot100.get_figure()
 fig.set_figwidth(8)
@@ -40,5 +40,5 @@ fig.set_figheight(4)
 
 fig.savefig(str(args.device_name) + '_rth_rw=100.svg', format='svg', transparent=True)
 fig.savefig(str(args.device_name) + '_rth_rw=100.png', format='png', bbox_inches='tight')
-fig.savefig(str(args.device_name) + '_rth_rw=100.pdf', format='pdf', bbox_inches='tight')
+#fig.savefig(str(args.device_name) + '_rth_rw=100.pdf', format='pdf', bbox_inches='tight')
 

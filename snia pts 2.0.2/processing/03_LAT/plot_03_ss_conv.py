@@ -31,4 +31,4 @@ ss_conv_plot.set(ylim=(0, None))
 
 ss_conv_plot.savefig(str(args.device_name) + '_lat_ss_conv.svg', format='svg', transparent=True)
 ss_conv_plot.savefig(str(args.device_name) + '_lat_ss_conv.png', format='png')
-ss_conv_plot.savefig(str(args.device_name) + '_lat_ss_conv.pdf', format='pdf')
+#ss_conv_plot.savefig(str(args.device_name) + '_lat_ss_conv.pdf', format='pdf')

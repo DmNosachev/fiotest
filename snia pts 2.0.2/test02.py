@@ -41,7 +41,7 @@ FioArgs = ['--output-format=json', '--eta=always',
 
 if args.PTSClMode:
   logging.info('Client mode selected')
-  FioArgs.append('--size=' + str(ptsu.getDeviceSize(str(round(args.Device * 0.75)))))
+  FioArgs.append('--size=' + str(round(ptsu.getDeviceSize(args.Device) * 0.75)))
   
 ptsu.prepResultsDir(TestName)
 

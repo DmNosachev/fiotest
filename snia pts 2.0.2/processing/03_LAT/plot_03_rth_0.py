@@ -14,7 +14,7 @@ args = parser.parse_args()
 plt.rc('font', size=8)
 
 
-rth_data0 = pd.read_csv('test030_clat.1.log', sep = ',',
+rth_data0 = pd.read_csv('test0_30_clat.1.log', sep = ',',
                       usecols=[1], names=['Lat'])
 rth_data0.Lat = rth_data0.Lat.multiply(0.001)
 
@@ -33,7 +33,7 @@ plt.axvline(x=Lat_p4n, label='99.99%: ' + str(round(Lat_p4n, 2)), linestyle='das
 plt.axvline(x=Lat_p5n, label='99.999%: ' + str(round(Lat_p5n, 2)), linestyle='solid', color='tab:orange')
 plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 rth_plot0.set(xlabel='Latency, µs')
-rth_plot0.set_xlim(10, 10000)
+#rth_plot0.set_xlim(10, 10000)
 
 fig = rth_plot0.get_figure()
 fig.set_figwidth(8)

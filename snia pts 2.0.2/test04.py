@@ -38,7 +38,7 @@ if args.PTSClMode:
   logging.info('Client mode selected')
   OIO = 16
   TC = 2
-  FioArgs.append('--size=' + str(ptsu.getDeviceSize(str(round(args.Device * 0.75)))))
+  FioArgs.append('--size=' + str(round(ptsu.getDeviceSize(args.Device) * 0.75)))
 else:
   OIO = 32
   TC = 4

@@ -32,4 +32,5 @@ plt.axhline(y=av_ss * 1.1, color='tab:green', linestyle='dashed')
 plt.axhline(y=av_ss, color='tab:blue', linestyle='dashed')
 plt.axhline(y=av_ss * 0.9, color='tab:purple', linestyle='dashed')
 plt.xticks(x, ss_df['Round'].tolist())
+
 plt.savefig(str(args.device_name) + '_lat_ss_verify.pdf', format='pdf')
