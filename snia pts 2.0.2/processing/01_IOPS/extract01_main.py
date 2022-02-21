@@ -4,6 +4,7 @@ import json
 import csv
 import os
 import errno
+import pandas as pd
 
 ProcessingName = 'test01_main'
 BlockSizes = [512, 4096, 8192, 16384, 32768, 65536, 131072, 1048576]
@@ -53,3 +54,7 @@ with open(CSVFileName , mode='w') as CSVFile:
         IOPSList.append(iops)
       TestRoundWriter.writerow([BS, RWMix, int(round(Average(IOPSList)))])
   CSVFile.close()
+
+iops_data = pd.read_csv(CSVFileName, sep = ';', header=0)
+iops_pvt = iops_data.pivot(index='BS', columns='RWMIX', values='IOPS')
+iops_pvt.to_csv(ProcessingName + '_pivot.csv', sep = ';')

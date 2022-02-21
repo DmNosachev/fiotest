@@ -12,7 +12,7 @@ parser.add_argument('-ssr','--ss-round', help='Final round for steady state veri
                       choices=range(5, 25), required=False)
 args = parser.parse_args()
 
-FileFormats = ['svg', 'pdf']
+FileFormats = ['svg', 'png']
 
 BlockSizes = [4096, 65536, 1048576]
 RWMixes = [0, 65, 100]

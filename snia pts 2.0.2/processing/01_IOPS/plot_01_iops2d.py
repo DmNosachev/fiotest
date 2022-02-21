@@ -36,4 +36,4 @@ iops_plot.set(yticks=[1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 1000
 
 iops_plot.savefig(str(args.device_name) + '_iops2d.svg', format='svg', transparent=True)
 iops_plot.savefig(str(args.device_name) + '_iops2d.png', format='png')
-iops_plot.savefig(str(args.device_name) + '_iops2d.pdf', format='pdf')
+#iops_plot.savefig(str(args.device_name) + '_iops2d.pdf', format='pdf')

@@ -10,7 +10,7 @@ import ptsutils as ptsu
 from tqdm import tqdm
 from command_runner import command_runner
 
-TestName = '01_WSAT'
+TestName = '01_IOPS'
 
 try:
     os.remove(TestName + '.log')
