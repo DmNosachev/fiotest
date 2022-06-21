@@ -74,7 +74,7 @@ for TestPass in tqdm(range(1, int(args.MaxRounds)+1)):
 BS = '1m'
 
 logging.info('Starting preconditioning' + ' (' + BS + ')')
-  exit_code, output = command_runner('fio --name=precondition1M \
+exit_code, output = command_runner('fio --name=precondition1M \
                          --filename=' + str(args.Device) + ' --iodepth=32 \
                          --numjobs=1 --bs=' + BS + ' --ioengine=libaio \
                          --rw=write --group_reporting --direct=1 \
