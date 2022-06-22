@@ -71,8 +71,8 @@ for TestPass in tqdm(range(1, PCRounds+1)):
                ' of ' + str(PCRounds) + ' complete')
 
 logging.info('Starting test: ' + TestName)
-for SleepTime in SleepIntervals
-  for TestPass in range(1, StateRounds+1)):
+for SleepTime in SleepIntervals:
+  for TestPass in range(1, StateRounds+1):
     JSONFileName = ('fio_st=' + str(SleepTime) + '_pass=' + str(TestPass) + '.json')
     exit_code, output = command_runner('fio --runtime=' + str(WLTime) +
                      ' --filename=' + str(args.Device) +
