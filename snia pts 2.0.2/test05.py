@@ -72,8 +72,9 @@ for TestPass in tqdm(range(1, PCRounds+1)):
 
 logging.info('Starting test: ' + TestName)
 for SleepTime in SleepIntervals:
+# Main segment with pause (Access A + Access B)
   for TestPass in range(1, StateRounds+1):
-    JSONFileName = ('fio_st=' + str(SleepTime) + '_pass=' + str(TestPass) + '.json')
+    JSONFileName = ('fio_st=' + str(SleepTime) + '_AB_pass=' + str(TestPass) + '.json')
     exit_code, output = command_runner('fio --runtime=' + str(WLTime) +
                      ' --filename=' + str(args.Device) +
                      ' --ioengine=' + str(args.IOEngine) +
@@ -83,5 +84,18 @@ for SleepTime in SleepIntervals:
                      ' ' + ' '.join(FioArgs),
                      timeout=WLTime + SleepTime + 5)
     time.sleep(SleepTime)
-    logging.info('State ' + str(SleepTime) + ': round ' + str(TestPass) +
-                 ' of ' + str(StateRounds) + ' complete')                 
+    logging.info('State ' + str(SleepTime) + 'Access A+B: round ' + str(TestPass) +
+                 ' of ' + str(StateRounds) + ' complete')
+# Return to baseline (Access C)                 
+  for TestPass in range(1, StateRounds+1):
+    JSONFileName = ('fio_st=' + str(SleepTime) + '_C_pass=' + str(TestPass) + '.json')
+    exit_code, output = command_runner('fio --runtime=5' +
+                     ' --filename=' + str(args.Device) +
+                     ' --ioengine=' + str(args.IOEngine) +
+                     ' --numjobs=' + str(TC) +
+                     ' --iodepth=' + str(OIO) +
+                     ' --output=' + TestName + '/results/' + JSONFileName +
+                     ' ' + ' '.join(FioArgs),
+                     timeout=5 + 5)
+    logging.info('State ' + str(SleepTime) + 'Access C: round ' + str(TestPass) +
+                 ' of ' + str(StateRounds) + ' complete')                     

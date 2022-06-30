@@ -19,11 +19,11 @@ filename = 'test05.csv'
 sns.set_style("whitegrid")
 
 hue_colors = { 'State C': 'black',
-               'State AB 1': 'tab:blue', 
-               'State AB 2': 'tab:orange', 
-               'State AB 3': 'tab:green',
-               'State AB 5': 'tab:red',
-               'State AB 10': 'tab:purple'}
+               'State AB 5': 'tab:blue', 
+               'State AB 10': 'tab:orange', 
+               'State AB 15': 'tab:green',
+               'State AB 25': 'tab:red',
+               'State AB 50': 'tab:purple'}
               
 hir_data = pd.read_csv(filename, sep = ';', header=0)
 hir_data_melted = pd.melt(hir_data, id_vars=['Round', 'IOPS', 'STATE'], value_vars=['AVLAT', 'P99_LAT', 'P99D9_LAT', 'P99D99_LAT', 'MAX_LAT'], var_name='Latency type')
